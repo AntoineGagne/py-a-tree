@@ -41,7 +41,6 @@ requires = ["maturin>=1.12,<2.0"]
 build-backend = "maturin"
 
 [tool.maturin]
-python-source = "python"
 strip = true
 include = [{path = "rust-toolchain.toml", format = ["sdist"]}]
 
