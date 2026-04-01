@@ -1,59 +1,66 @@
 use mimalloc::MiMalloc;
+use pyo3::create_exception;
+use pyo3::exceptions::PyException;
 use pyo3::prelude::*;
 
 #[global_allocator]
 static GLOBAL: MiMalloc = MiMalloc;
 
+create_exception!(
+    a_tree,
+    ATreeException,
+    PyException,
+    "An error produced by an ATree"
+);
+create_exception!(
+    a_tree,
+    DuplicateAttributeException,
+    ATreeException,
+    "Duplicate attribute"
+);
+create_exception!(
+    a_tree,
+    MissingAttributeException,
+    ATreeException,
+    "Duplicate attribute"
+);
+create_exception!(
+    a_tree,
+    MismatchingAttributeTypeException,
+    ATreeException,
+    "Attribute type does not match with the type required by the expression or the tree"
+);
+create_exception!(
+    a_tree,
+    NonExistingAttribute,
+    ATreeException,
+    "Referenced attribute does not exist"
+);
+create_exception!(
+    a_tree,
+    ParseException,
+    ATreeException,
+    "Expression could not be parsed"
+);
+create_exception!(
+    a_tree,
+    LockException,
+    ATreeException,
+    "Expression could not be parsed"
+);
+
 #[pymodule(name = "a_tree", gil_used = false)]
 mod py_a_tree {
+    #[pymodule_export]
+    use super::{
+        ATreeException, DuplicateAttributeException, LockException,
+        MismatchingAttributeTypeException, MissingAttributeException, NonExistingAttribute,
+        ParseException,
+    };
     use std::sync::{Arc, Mutex};
 
     use a_tree::{ATree, ATreeError, AttributeDefinition, Event, EventError};
-    use pyo3::exceptions::PyException;
-    use pyo3::{create_exception, prelude::*};
-
-    create_exception!(
-        py_a_tree,
-        ATreeException,
-        PyException,
-        "An error produced by an ATree"
-    );
-    create_exception!(
-        py_a_tree,
-        DuplicateAttributeException,
-        ATreeException,
-        "Duplicate attribute"
-    );
-    create_exception!(
-        py_a_tree,
-        MissingAttributeException,
-        ATreeException,
-        "Duplicate attribute"
-    );
-    create_exception!(
-        py_a_tree,
-        MismatchingAttributeTypeException,
-        ATreeException,
-        "Attribute type does not match with the type required by the expression or the tree"
-    );
-    create_exception!(
-        py_a_tree,
-        NonExistingAttribute,
-        ATreeException,
-        "Referenced attribute does not exist"
-    );
-    create_exception!(
-        py_a_tree,
-        ParseException,
-        ATreeException,
-        "Expression could not be parsed"
-    );
-    create_exception!(
-        py_a_tree,
-        LockException,
-        ATreeException,
-        "Expression could not be parsed"
-    );
+    use pyo3::prelude::*;
 
     #[pyclass(name = "AttributeDefinition")]
     #[derive(Clone)]
@@ -207,8 +214,9 @@ mod py_a_tree {
 
     #[pymethods]
     impl PyReport {
-        pub fn matches(&self) -> Vec<u64> {
-            self.0.clone()
+        #[getter]
+        pub fn get_matches(&self) -> PyResult<Vec<u64>> {
+            Ok(self.0.clone())
         }
 
         fn __repr__(&self) -> String {
