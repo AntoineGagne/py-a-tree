@@ -1,4 +1,8 @@
+use mimalloc::MiMalloc;
 use pyo3::prelude::*;
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
 
 #[pymodule(name = "a_tree", gil_used = false)]
 mod py_a_tree {
