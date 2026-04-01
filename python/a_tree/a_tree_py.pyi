@@ -1,11 +1,11 @@
 """
-Type stubs for a_tree_py — PyO3 bindings for the `a-tree` Rust crate.
+Set of classes to interact with an ATree
 """
 
 from __future__ import annotations
 
 class AttributeDefinition:
-    """Describes the name and type of a single attribute accepted by an ATree."""
+    """An attribute of the ATree (name and type)"""
 
     @staticmethod
     def boolean(name: str) -> AttributeDefinition:
@@ -14,16 +14,12 @@ class AttributeDefinition:
 
     @staticmethod
     def integer(name: str) -> AttributeDefinition:
-        """Create an integer (i64) attribute definition."""
+        """Create an integer attribute definition."""
         ...
 
     @staticmethod
     def float(name: str) -> AttributeDefinition:
-        """Create a float attribute definition.
-
-        Values are set as (mantissa, scale) pairs where the float equals
-        ``mantissa * 10^(-scale)``.
-        """
+        """Create a float attribute definition."""
         ...
 
     @staticmethod
@@ -33,24 +29,21 @@ class AttributeDefinition:
 
     @staticmethod
     def integer_list(name: str) -> AttributeDefinition:
-        """Create an integer-list attribute definition."""
+        """Create a list of integers attribute definition."""
         ...
 
     @staticmethod
     def string_list(name: str) -> AttributeDefinition:
-        """Create a string-list attribute definition."""
+        """Create a list of strings attribute definition."""
         ...
 
 class Event:
-    """A fully constructed event produced by ``EventBuilder.build()``.
-
-    Pass to ``ATree.search()`` or ``ATreeStr.search()``.
-    """
+    """An event to be used for searching for matching subscriptions."""
 
     ...
 
 class EventBuilder:
-    """Builder for an Event.  Obtain via ``ATree.make_event()``."""
+    """Builder for an Event."""
 
     def with_boolean(self, name: str, value: bool) -> None:
         """Set a boolean attribute."""
@@ -61,7 +54,7 @@ class EventBuilder:
         ...
 
     def with_float(self, name: str, mantissa: int, scale: int) -> None:
-        """Set a float attribute as ``mantissa * 10^(-scale)``."""
+        """Set a float attribute as ``number * 10^(-scale)``."""
         ...
 
     def with_string(self, name: str, value: str) -> None:
@@ -69,11 +62,11 @@ class EventBuilder:
         ...
 
     def with_integer_list(self, name: str, value: list[int]) -> None:
-        """Set an integer-list attribute."""
+        """Set a list of integers attribute."""
         ...
 
     def with_string_list(self, name: str, values: list[str]) -> None:
-        """Set a string-list attribute."""
+        """Set a list of strings attribute."""
         ...
 
     def with_undefined(self, name: str) -> None:
@@ -81,20 +74,8 @@ class EventBuilder:
         ...
 
     def build(self) -> Event:
-        """Produce the ``Event``.  Raises ``RuntimeError`` on invalid input."""
+        """Produce the populated ``Event``."""
         ...
-
-class EventBuilderStr:
-    """Builder for an Event.  Obtain via ``ATreeStr.make_event()``."""
-
-    def with_boolean(self, name: str, value: bool) -> None: ...
-    def with_integer(self, name: str, value: int) -> None: ...
-    def with_float(self, name: str, mantissa: int, scale: int) -> None: ...
-    def with_string(self, name: str, value: str) -> None: ...
-    def with_integer_list(self, name: str, value: list[int]) -> None: ...
-    def with_string_list(self, name: str, values: list[str]) -> None: ...
-    def with_undefined(self, name: str) -> None: ...
-    def build(self) -> Event: ...
 
 class Report:
     """Search result from ``ATree.search()``.  IDs are ``int``."""
@@ -103,59 +84,48 @@ class Report:
         """Return the subscription IDs whose expressions matched the event."""
         ...
 
-class ReportStr:
-    """Search result from ``ATreeStr.search()``.  IDs are ``str``."""
-
-    def matches(self) -> list[str]:
-        """Return the subscription IDs whose expressions matched the event."""
-        ...
-
 class ATree:
-    """A-Tree with integer (``int`` / ``u64``) subscription IDs.
+    """A-Tree with uint64 subscription IDs.
 
-    Example::
-
-        from a_tree_py import ATree, AttributeDefinition
-
-        tree = ATree([
-            AttributeDefinition.string_list("deal_ids"),
-            AttributeDefinition.integer("exchange_id"),
-            AttributeDefinition.boolean("debug"),
-            AttributeDefinition.integer_list("segment_ids"),
-        ])
-
-        tree.insert(1, 'deal_ids one of ["deal-1", "deal-2"]')
-        tree.insert(2, 'segment_ids one of [1, 2, 3, 4]')
-
-        builder = tree.make_event()
-        builder.with_string_list("deal_ids", ["deal-2"])
-        builder.with_integer_list("segment_ids", [1, 2])
-        builder.with_boolean("debug", False)
-        event = builder.build()
-
-        report = tree.search(event)
-        print(report.matches())  # [1, 2]
+    >> from a_tree_py import ATree, AttributeDefinition
+    >>
+    >> tree = ATree([
+    >>     AttributeDefinition.string_list("deal_ids"),
+    >>     AttributeDefinition.integer("exchange_id"),
+    >>     AttributeDefinition.boolean("debug"),
+    >>     AttributeDefinition.integer_list("segment_ids"),
+    >> ])
+    >> tree.insert(1, 'deal_ids one of ["deal-1", "deal-2"]')
+    >> tree.insert(2, 'segment_ids one of [1, 2, 3, 4]')
+    >>
+    >> builder = tree.make_event()
+    >> builder.with_string_list("deal_ids", ["deal-2"])
+    >> builder.with_integer_list("segment_ids", [1, 2])
+    >> builder.with_boolean("debug", False)
+    >> event = builder.build()
+    >>
+    >> report = tree.search(event)
+    >> report.matches()
+    [1, 2]
     """
 
     def __init__(self, definitions: list[AttributeDefinition]) -> None:
         """Create a new ATree.
 
-        :param definitions: Attribute definitions; names must be unique.
-        :raises RuntimeError: On duplicate attribute names.
+        :param definitions: The definitions of the attributes that can be used by the arbitrary boolean expressions. These attributes must be uniques (no duplicates are allowed).
         """
         ...
 
     def insert(self, subscription_id: int, expression: str) -> None:
         """Insert a boolean expression.
 
-        :param subscription_id: Non-negative integer key.
-        :param expression: DSL expression string.
-        :raises RuntimeError: On parse or semantic errors.
+        :param subscription_id: The subscription ID for that boolean expression
+        :param expression: An arbitrary boolean expression
         """
         ...
 
     def delete(self, subscription_id: int) -> None:
-        """Remove the expression for *subscription_id* (no-op if missing)."""
+        """Remove the corresponding expression or the subscription (in the case where more than one subscription is pointing to the same expression)."""
         ...
 
     def make_event(self) -> EventBuilder:
@@ -165,7 +135,7 @@ class ATree:
     def search(self, event: Event) -> Report:
         """Find all expressions that match *event*.
 
-        :raises RuntimeError: On internal errors.
+        :param event: The event to search the tree with
         """
         ...
 
