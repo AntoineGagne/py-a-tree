@@ -4,9 +4,52 @@ use pyo3::prelude::*;
 mod py_a_tree {
     use std::sync::{Arc, Mutex};
 
-    use a_tree::{ATree, AttributeDefinition, Event, EventError};
-    use pyo3::exceptions::PyRuntimeError;
-    use pyo3::prelude::*;
+    use a_tree::{ATree, ATreeError, AttributeDefinition, Event, EventError};
+    use pyo3::exceptions::PyException;
+    use pyo3::{create_exception, prelude::*};
+
+    create_exception!(
+        py_a_tree,
+        ATreeException,
+        PyException,
+        "An error produced by an ATree"
+    );
+    create_exception!(
+        py_a_tree,
+        DuplicateAttributeException,
+        ATreeException,
+        "Duplicate attribute"
+    );
+    create_exception!(
+        py_a_tree,
+        MissingAttributeException,
+        ATreeException,
+        "Duplicate attribute"
+    );
+    create_exception!(
+        py_a_tree,
+        MismatchingAttributeTypeException,
+        ATreeException,
+        "Attribute type does not match with the type required by the expression or the tree"
+    );
+    create_exception!(
+        py_a_tree,
+        NonExistingAttribute,
+        ATreeException,
+        "Referenced attribute does not exist"
+    );
+    create_exception!(
+        py_a_tree,
+        ParseException,
+        ATreeException,
+        "Expression could not be parsed"
+    );
+    create_exception!(
+        py_a_tree,
+        LockException,
+        ATreeException,
+        "Expression could not be parsed"
+    );
 
     #[pyclass(name = "AttributeDefinition")]
     #[derive(Clone)]
@@ -53,7 +96,7 @@ mod py_a_tree {
     enum Assignment {
         Boolean(String, bool),
         Integer(String, i64),
-        Float(String, i64, u32), // mantissa, scale
+        Float(String, i64, u32),
         String(String, String),
         IntegerList(String, Vec<i64>),
         StringList(String, Vec<String>),
@@ -111,7 +154,10 @@ mod py_a_tree {
         }
 
         pub fn build(&self) -> PyResult<PyEvent> {
-            let guard = self.atree.lock().map_err(|e| atree_err(e.to_string()))?;
+            let guard = self
+                .atree
+                .lock()
+                .map_err(|error| LockException::new_err(error.to_string()))?;
             let mut builder = guard.make_event();
 
             for assignment in &self.assignments {
@@ -131,10 +177,10 @@ mod py_a_tree {
                     }
                     Assignment::Undefined(name) => builder.with_undefined(name),
                 };
-                result.map_err(event_err)?;
+                result.map_err(from_event_error)?;
             }
 
-            Ok(PyEvent(builder.build().map_err(event_err)?))
+            Ok(PyEvent(builder.build().map_err(from_event_error)?))
         }
 
         fn __repr__(&self) -> String {
@@ -177,19 +223,25 @@ mod py_a_tree {
                 .iter()
                 .map(|definition| definition.0.clone())
                 .collect();
-            let atree = ATree::new(&definitions).map_err(atree_err)?;
+            let atree = ATree::new(&definitions).map_err(from_atree_error)?;
             Ok(Self(Arc::new(Mutex::new(atree))))
         }
 
         pub fn insert(&self, subscription_id: u64, expression: &str) -> PyResult<()> {
-            let mut guard = self.0.lock().map_err(|e| atree_err(e.to_string()))?;
+            let mut guard = self
+                .0
+                .lock()
+                .map_err(|error| LockException::new_err(error.to_string()))?;
             guard
                 .insert(&subscription_id, expression)
-                .map_err(atree_err)
+                .map_err(from_atree_error)
         }
 
         pub fn delete(&self, subscription_id: u64) -> PyResult<()> {
-            let mut guard = self.0.lock().map_err(|e| atree_err(e.to_string()))?;
+            let mut guard = self
+                .0
+                .lock()
+                .map_err(|error| LockException::new_err(error.to_string()))?;
             guard.delete(&subscription_id);
             Ok(())
         }
@@ -202,15 +254,21 @@ mod py_a_tree {
         }
 
         pub fn search(&self, event: &PyEvent) -> PyResult<PyReport> {
-            let guard = self.0.lock().map_err(|e| atree_err(e.to_string()))?;
-            let report = guard.search(&event.0).map_err(atree_err)?;
+            let guard = self
+                .0
+                .lock()
+                .map_err(|error| LockException::new_err(error.to_string()))?;
+            let report = guard.search(&event.0).map_err(from_atree_error)?;
             Ok(PyReport(
                 report.matches().iter().copied().copied().collect(),
             ))
         }
 
         pub fn to_graphviz(&self) -> PyResult<String> {
-            let guard = self.0.lock().map_err(|e| atree_err(e.to_string()))?;
+            let guard = self
+                .0
+                .lock()
+                .map_err(|error| LockException::new_err(error.to_string()))?;
             Ok(guard.to_graphviz())
         }
 
@@ -219,11 +277,30 @@ mod py_a_tree {
         }
     }
 
-    fn atree_err(e: impl std::fmt::Debug) -> PyErr {
-        PyRuntimeError::new_err(format!("{e:?}"))
+    fn from_atree_error(error: ATreeError<'_>) -> PyErr {
+        match error {
+            ATreeError::ParseError(error) => ParseException::new_err(error.to_string()),
+            ATreeError::Event(error) => from_event_error(error),
+        }
     }
 
-    fn event_err(e: EventError) -> PyErr {
-        PyRuntimeError::new_err(format!("{e:?}"))
+    fn from_event_error(error: EventError) -> PyErr {
+        match error {
+            error @ EventError::AlreadyPresent(_) => {
+                DuplicateAttributeException::new_err(error.to_string())
+            }
+            error @ EventError::MissingAttributes => {
+                MissingAttributeException::new_err(error.to_string())
+            }
+            error @ EventError::NonExistingAttribute(_) => {
+                NonExistingAttribute::new_err(error.to_string())
+            }
+            error @ EventError::WrongType { .. } => {
+                MismatchingAttributeTypeException::new_err(error.to_string())
+            }
+            error @ EventError::MismatchingTypes { .. } => {
+                MismatchingAttributeTypeException::new_err(error.to_string())
+            }
+        }
     }
 }
