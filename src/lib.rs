@@ -62,7 +62,7 @@ mod py_a_tree {
     use a_tree::{ATree, ATreeError, AttributeDefinition, Event, EventError};
     use pyo3::prelude::*;
 
-    #[pyclass(name = "AttributeDefinition")]
+    #[pyclass(name = "AttributeDefinition", frozen, immutable_type)]
     #[derive(Clone)]
     pub struct PyAttributeDefinition(AttributeDefinition);
 
@@ -199,7 +199,7 @@ mod py_a_tree {
         }
     }
 
-    #[pyclass(name = "Event")]
+    #[pyclass(name = "Event", frozen, immutable_type)]
     pub struct PyEvent(Event);
 
     #[pymethods]
@@ -209,7 +209,7 @@ mod py_a_tree {
         }
     }
 
-    #[pyclass(name = "Report")]
+    #[pyclass(name = "Report", frozen, immutable_type)]
     pub struct PyReport(Vec<u64>);
 
     #[pymethods]
