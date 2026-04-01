@@ -1,14 +1,49 @@
 [project]
 name = "atree"
+dynamic = ["version"]
+description = "A dynamic data structure for efficiently indexing arbitrary boolean expressions"
+authors = [
+    { name = "Antoine Gagné", email = "AntoineGagne@users.noreply.github.com" }
+]
+maintainers = [
+    { name = "Antoine Gagné", email = "AntoineGagne@users.noreply.github.com" }
+]
 requires-python = ">=3.13"
 classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dynamic = ["version"]
 
+[project.urls]
+"Bug Tracker" = "https://github.com/AntoineGagne/py-a-tree/issues"
+Source = "https://github.com/AntoineGagne/py-a-tree"
+
+[dependency-groups]
+dev = [
+    "pyright~=1.1",
+    "ruff~=0.12"
+]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+include = ["python/"]
+exclude = ["**/__pycache__"]
+
 [build-system]
 requires = ["maturin>=1.12,<2.0"]
 build-backend = "maturin"
 
+[tool.maturin]
+python-source = "python"
+strip = true
+include = [{path = "rust-toolchain.toml", format = ["sdist"]}]
+
+[tool.ruff]
+line-length = 120
