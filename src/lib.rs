@@ -1,6 +1,6 @@
 use pyo3::prelude::*;
 
-#[pymodule]
+#[pymodule(name = "a_tree", gil_used = false)]
 mod py_a_tree {
     use std::sync::{Arc, Mutex};
 
