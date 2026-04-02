@@ -124,18 +124,11 @@ class ATree:
     """
 
     def __init__(self, definitions: list[AttributeDefinition]) -> None:
-        """Create a new ATree.
-
-        :param definitions: The definitions of the attributes that can be used by the arbitrary boolean expressions. These attributes must be uniques (no duplicates are allowed).
-        """
+        """Create a new ATree."""
         ...
 
     def insert(self, subscription_id: int, expression: str) -> None:
-        """Insert a boolean expression.
-
-        :param subscription_id: The subscription ID for that boolean expression
-        :param expression: An arbitrary boolean expression
-        """
+        """Insert a boolean expression."""
         ...
 
     def delete(self, subscription_id: int) -> None:
@@ -147,10 +140,7 @@ class ATree:
         ...
 
     def search(self, event: Event) -> Report:
-        """Find all expressions that match *event*.
-
-        :param event: The event to search the tree with
-        """
+        """Find all expressions that match the event."""
         ...
 
     def to_graphviz(self) -> str:
