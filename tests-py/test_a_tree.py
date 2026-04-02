@@ -1,4 +1,5 @@
 import pytest
+
 from a_tree import ATree, AttributeDefinition
 
 SOME_ATTRIBUTES = [
@@ -74,7 +75,7 @@ def test_that_it_can_search_an_atree():
     event = builder.build()
     found = tree.search(event)
 
-    assert [A_SUBSCRIPTION_ID, ANOTHER_SUBSCRIPTION_ID] == found.matches()
+    assert [A_SUBSCRIPTION_ID, ANOTHER_SUBSCRIPTION_ID] == found.matches
 
 
 @pytest.mark.skip(reason="There seems to be an issue with deletion")
