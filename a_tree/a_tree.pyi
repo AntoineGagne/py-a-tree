@@ -99,6 +99,8 @@ class Report:
 class ATree:
     """A-Tree with uint64 subscription IDs.
 
+    # Example
+
     >> from a_tree_py import ATree, AttributeDefinition
     >>
     >> tree = ATree([
@@ -141,7 +143,7 @@ class ATree:
         ...
 
     def make_event(self) -> EventBuilder:
-        """Return a fresh ``EventBuilder`` with all attributes undefined."""
+        """Return an ``EventBuilder`` with all attributes undefined."""
         ...
 
     def search(self, event: Event) -> Report:
