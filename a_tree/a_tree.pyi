@@ -1,5 +1,5 @@
 """
-Set of classes to interact with an ATree
+Set of classes to interact with an ``ATree``.
 """
 
 from __future__ import annotations

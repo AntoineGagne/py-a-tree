@@ -1,6 +1,6 @@
 import pytest
 
-from a_tree import ATree, AttributeDefinition
+from a_tree import ATree, ATreeException, AttributeDefinition
 
 SOME_ATTRIBUTES = [
     AttributeDefinition.boolean("private"),
@@ -49,19 +49,19 @@ def test_that_it_can_insert_expression():
 
 def test_that_it_fails_to_insert_expression_when_it_refers_to_non_existing_attributes():
     tree = ATree(SOME_ATTRIBUTES)
-    with pytest.raises(Exception):
+    with pytest.raises(ATreeException):
         tree.insert(A_SUBSCRIPTION_ID, SOME_EXPRESSION_WITH_NON_EXISTING_ATTRIBUTE)
 
 
 def test_that_it_fails_to_insert_expression_when_it_has_syntactic_errors():
     tree = ATree(SOME_ATTRIBUTES)
-    with pytest.raises(Exception):
+    with pytest.raises(ATreeException):
         tree.insert(A_SUBSCRIPTION_ID, SOME_EXPRESSION_WITH_SYNTACTIC_ERRORS)
 
 
 def test_that_it_fails_to_insert_expression_when_it_has_mismatching_types():
     tree = ATree(SOME_ATTRIBUTES)
-    with pytest.raises(Exception):
+    with pytest.raises(ATreeException):
         tree.insert(A_SUBSCRIPTION_ID, SOME_EXPRESSION_WITH_MISMATCHING_TYPES)
 
 
