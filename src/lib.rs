@@ -214,7 +214,7 @@ mod py_a_tree {
 
     #[pymethods]
     impl PyReport {
-        #[getter]
+        #[getter(matches)]
         pub fn get_matches(&self) -> PyResult<Vec<u64>> {
             Ok(self.0.clone())
         }
