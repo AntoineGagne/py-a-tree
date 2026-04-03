@@ -22,7 +22,7 @@ create_exception!(
     a_tree,
     MissingAttributeException,
     ATreeException,
-    "Duplicate attribute"
+    "Missing attribute"
 );
 create_exception!(
     a_tree,
@@ -46,7 +46,7 @@ create_exception!(
     a_tree,
     LockException,
     ATreeException,
-    "Expression could not be parsed"
+    "Lock could not be acquired"
 );
 
 #[pymodule(name = "a_tree", gil_used = false)]

@@ -132,7 +132,7 @@ class EventBuilder:
         ...
 
     def build(self) -> Event:
-        """Produce the populated ``Event``."""
+        """Build the populated ``Event``."""
         ...
 
 class Event:
@@ -141,7 +141,7 @@ class Event:
     ...
 
 class Report:
-    """Search result from ``ATree.search()``.  IDs are ``int``."""
+    """Contains the search results"""
 
     def matches(self) -> list[int]:
         """Return the subscription IDs whose expressions matched the event."""
