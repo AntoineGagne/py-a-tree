@@ -1,5 +1,5 @@
 [project]
-name = "atree"
+name = "py_a_tree"
 dynamic = ["version"]
 description = "A dynamic data structure for efficiently indexing arbitrary boolean expressions"
 authors = [

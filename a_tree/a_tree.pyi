@@ -21,7 +21,7 @@ class ATree:
 
     # Example
 
-    >> from a_tree_py import ATree, AttributeDefinition
+    >> from a_tree import ATree, AttributeDefinition
     >>
     >> tree = ATree([
     >>     AttributeDefinition.string_list("deal_ids"),
