@@ -36,7 +36,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --uv --develop
+          args: --develop --uv
           sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
           manylinux: auto
       - name: Check format
@@ -68,7 +68,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --uv --develop
+          args: --develop --uv
           sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
           manylinux: musllinux_1_2
       - name: Check format
@@ -102,7 +102,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --uv --develop
+          args: --develop --uv
           sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
       - name: Check format
         run: uv run ruff format --check
@@ -131,7 +131,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --uv --develop
+          args: --develop --uv
           sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
       - name: Check Python format
         run: uv run ruff format --check
