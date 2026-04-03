@@ -1,10 +1,6 @@
-use mimalloc::MiMalloc;
 use pyo3::create_exception;
 use pyo3::exceptions::PyException;
 use pyo3::prelude::*;
-
-#[global_allocator]
-static GLOBAL: MiMalloc = MiMalloc;
 
 create_exception!(
     a_tree,

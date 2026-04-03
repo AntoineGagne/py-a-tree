@@ -10,7 +10,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 a-tree = "0.5.1"
-mimalloc = "0.1.43"
 pyo3 = "0.27.0"
 
 [profile.release]
