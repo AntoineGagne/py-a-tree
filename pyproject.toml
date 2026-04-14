@@ -32,6 +32,10 @@ dev = [
     "pytest~=9.0",
     "ruff~=0.12"
 ]
+docs = [
+    "Sphinx~=9.1",
+    "sphinx-rtd-theme~=3.1"
+]
 
 [tool.pyright]
 venvPath = "."

@@ -17,31 +17,7 @@ class ParseException(ATreeException): ...
 class LockException(ATreeException): ...
 
 class ATree:
-    """A-Tree with uint64 subscription IDs.
-
-    # Example
-
-    >> from a_tree import ATree, AttributeDefinition
-    >>
-    >> tree = ATree([
-    >>     AttributeDefinition.string_list("deal_ids"),
-    >>     AttributeDefinition.integer("exchange_id"),
-    >>     AttributeDefinition.boolean("debug"),
-    >>     AttributeDefinition.integer_list("segment_ids"),
-    >> ])
-    >> tree.insert(1, 'deal_ids one of ["deal-1", "deal-2"]')
-    >> tree.insert(2, 'segment_ids one of [1, 2, 3, 4]')
-    >>
-    >> builder = tree.make_event()
-    >> builder.with_string_list("deal_ids", ["deal-2"])
-    >> builder.with_integer_list("segment_ids", [1, 2])
-    >> builder.with_boolean("debug", False)
-    >> event = builder.build()
-    >>
-    >> report = tree.search(event)
-    >> report.matches()
-    [1, 2]
-    """
+    """The A-Tree data structure."""
 
     def __init__(self, definitions: list[AttributeDefinition]) -> None:
         """Create a new ATree."""
@@ -143,6 +119,7 @@ class Event:
 class Report:
     """Contains the search results"""
 
+    @property
     def matches(self) -> list[int]:
         """Return the subscription IDs whose expressions matched the event."""
         ...
