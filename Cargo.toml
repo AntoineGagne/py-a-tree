@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 a-tree = "0.5.1"
-pyo3 = "0.28.3"
+pyo3 = "0.29.2"
 
 [profile.release]
 lto = "fat"
